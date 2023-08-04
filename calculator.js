@@ -121,7 +121,7 @@ document.getElementById('calculate-btn').addEventListener('click', e => {
     const calculateData = [...new FormData(calculateForm)]; // аналогично как Array.from(new FormData(calculateForm))
 
     // для расчета скидки
-    const fivePercent = (calculateData[2][1] * 5 / 100) === +calculateData[4][1]; // если совпало так, что право это 5% от лево
+    const fivePercent = (calculateData[0][1] * 5 / 100) === +calculateData[2][1]; // если совпало так, что право это 5% от лево
     // конец расчета
     const fastStart = document.querySelectorAll('.fast-start');
     const discount = document.querySelectorAll('.price-after-discount');
@@ -136,14 +136,14 @@ document.getElementById('calculate-btn').addEventListener('click', e => {
     let summaFastStartFormattedDiscount;
     let summaExtendedFormatted;
 
-    const result = calculation(calculateData[2][1], calculateData[3][1], calculateData[4][1], 1);
+    const result = calculation(calculateData[0][1], calculateData[1][1], calculateData[2][1], 1);
     summaFastStartFormatted = result[0];
     summaExtendedFormatted = result[1];
 
     if (fivePercent) {
         const prices = document.querySelectorAll('.prices');
 
-        const resultDiscount = calculation(calculateData[2][1], 0, calculateData[4][1], 0.6);
+        const resultDiscount = calculation(calculateData[0][1], 0, calculateData[2][1], 0.6);
         summaFastStartFormattedDiscount = resultDiscount[0];
 
         const newPrice = `<div class="price-after-discount">
