@@ -92,69 +92,73 @@ const parametrs = { // A23 и ниже
 };
 
 const calculation = (data0_1, data1_1, data2_1, discountCoefficient) => {
-    if (data0_1 === '')
-    {
+    if (data0_1 === '') {
         document.getElementById('kedo-field').value = 300;
         data0_1 = 300;
     }
 
-    if (data1_1 === '')
-    {
+    if (data1_1 === '') {
         document.getElementById('vcep-field').value = 2;
         data1_1 = 2;
     }
 
     const retailYearD3 = (data0_1 * unepRetail) + (data1_1 * ukepRetail);
     const retailYearD4 = parametrs[data2_1];
-    const addition = (retailYearD3 + retailYearD4) * discountCoefficient;
+    const fullFastStart = retailYearD3 + retailYearD4; // полная цена СТАРТ без скидки
+    const summaFastStart = Math.round(fullFastStart / 12);
+    const addition = Math.round(summaFastStart * discountCoefficient);
 
-    const summaFastStart = Math.round(addition / 12);
     const summaFastStartFormatted = summaFastStart.toLocaleString();
+    const summaFastStartDiscountFormatted = addition.toLocaleString();
     const summaExtendedFormatted = (summaFastStart + 13708).toLocaleString(); // 164500 / 12 = 13 708.33333333
+    const summaExtendedDiscountFormatted = (addition + 13708).toLocaleString();
 
-    return [summaFastStartFormatted, summaExtendedFormatted];
+    return [summaFastStartFormatted, summaExtendedFormatted, summaFastStartDiscountFormatted, summaExtendedDiscountFormatted];
 }
+
+const calculateForm = document.getElementById('new-calculator-form');
+const discountData = document.querySelectorAll('.discount-field');
 
 document.getElementById('calculate-btn').addEventListener('click', e => {
     e.preventDefault();
-    const calculateForm = document.getElementById('new-calculator-form');
+    const discountPercent = +discountData[0].value;
+    const discountTime = discountData[1].value;
+
     const calculateData = [...new FormData(calculateForm)]; // аналогично как Array.from(new FormData(calculateForm))
 
-    // для расчета скидки
-    const fivePercent = (calculateData[2][1] * 5 / 100) === +calculateData[4][1]; // если совпало так, что право это 5% от лево
-    // конец расчета
-    const fastStart = document.querySelectorAll('.fast-start');
+    const ratesPrices = document.querySelectorAll('.prices .discount');
     const discount = document.querySelectorAll('.price-after-discount');
 
-    if (discount.length)
-    {
+    if (discount.length) {
         discount.forEach(item => item.remove());
-        fastStart.forEach(item => item.classList.remove('discount-old-price'));
+        ratesPrices.forEach(item => item.classList.remove('discount-old-price'));
     }
 
-    let summaFastStartFormatted;
-    let summaFastStartFormattedDiscount;
-    let summaExtendedFormatted;
+    const discountExist = discountPercent > 0;
 
-    const result = calculation(calculateData[2][1], calculateData[3][1], calculateData[4][1], 1);
-    summaFastStartFormatted = result[0];
-    summaExtendedFormatted = result[1];
+    const result = calculation(calculateData[2][1], calculateData[3][1], calculateData[4][1], !discountExist ? 1 : discountPercent / 10);
+    const summaFastStartFormatted = result[0];
+    const summaExtendedFormatted = result[1];
+    const summaFastStartDiscountFormatted = result[2];
+    const summaExtendedDiscountFormatted = result[3];
 
-    if (fivePercent) {
+    if (discountExist) {
         const prices = document.querySelectorAll('.prices');
 
-        const resultDiscount = calculation(calculateData[2][1], 0, calculateData[4][1], 0.6);
-        summaFastStartFormattedDiscount = resultDiscount[0];
+        const resultsArray = [summaFastStartDiscountFormatted, summaExtendedDiscountFormatted].map(item => `<div class="price-after-discount">
+                    <span class="discount-new-price">${item} руб</span>
+                    <div class="discount-deadline">Срок действия акции до ${discountTime}</div>
+             </div>`);
 
-        const newPrice = `<div class="price-after-discount">
-                    <span class="discount-new-price">${summaFastStartFormattedDiscount} руб</span>
-                    <div class="discount-deadline">Срок действия акции до 01.09.2023</div>
-             </div>`;
+        ratesPrices.forEach(item => item.classList.add('discount-old-price'));
 
-        fastStart.forEach(item => item.classList.add('discount-old-price'));
-        prices.forEach(item => item.insertAdjacentHTML('afterbegin', newPrice));
+        let counter = 0;
+        prices.forEach(item => {
+            item.insertAdjacentHTML('afterbegin', resultsArray[counter]);
+            counter = counter !== resultsArray.length - 1 ? ++counter : 0;
+        });
     }
 
-    fastStart.forEach(item => item.innerHTML = `${summaFastStartFormatted} руб`);
+    ratesPrices.forEach(item => item.innerHTML = `${summaFastStartFormatted} руб`);
     document.querySelectorAll('.extended').forEach(item => item.innerHTML = `${summaExtendedFormatted} руб`);
 });
