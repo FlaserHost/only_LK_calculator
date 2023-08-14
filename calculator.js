@@ -105,13 +105,15 @@ const calculation = (data0_1, data1_1, data2_1, discountCoefficient) => {
     const retailYearD3 = (data0_1 * unepRetail) + (data1_1 * ukepRetail);
     const retailYearD4 = parametrs[data2_1];
     const fullFastStart = retailYearD3 + retailYearD4; // полная цена СТАРТ без скидки
-    const summaFastStart = Math.round(fullFastStart / 12);
-    const addition = Math.round(summaFastStart * discountCoefficient);
+    const summaFastStart = Math.round(fullFastStart / 12); // полная цена СТАРТ без скидки за месяц
+    const addition = Math.round(summaFastStart * discountCoefficient); // discountCoefficient% от стоимости СТАРТ
 
     const summaFastStartFormatted = summaFastStart.toLocaleString();
-    const summaFastStartDiscountFormatted = addition.toLocaleString();
-    const summaExtendedFormatted = (summaFastStart + 13708).toLocaleString(); // 164500 / 12 = 13 708.33333333
-    const summaExtendedDiscountFormatted = (addition + 13708).toLocaleString();
+    const summaFastStartDiscountFormatted = (summaFastStart - addition).toLocaleString();
+    const summaExtended = summaFastStart + 13708; // 164500 / 12 = 13 708.33333333
+    const extendedAddition = Math.round(summaExtended * discountCoefficient);
+    const summaExtendedFormatted = summaExtended.toLocaleString();
+    const summaExtendedDiscountFormatted = (summaExtended - extendedAddition).toLocaleString();
 
     return [summaFastStartFormatted, summaExtendedFormatted, summaFastStartDiscountFormatted, summaExtendedDiscountFormatted];
 }
@@ -136,7 +138,7 @@ document.getElementById('calculate-btn').addEventListener('click', e => {
 
     const discountExist = discountPercent > 0;
 
-    const result = calculation(calculateData[2][1], calculateData[3][1], calculateData[4][1], !discountExist ? 1 : discountPercent / 10);
+    const result = calculation(calculateData[2][1], calculateData[3][1], calculateData[4][1], !discountExist ? 1 : discountPercent / 100);
     const summaFastStartFormatted = result[0];
     const summaExtendedFormatted = result[1];
     const summaFastStartDiscountFormatted = result[2];
