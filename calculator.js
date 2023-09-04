@@ -78,19 +78,6 @@ document.getElementById('show-functionality-btn').addEventListener('click', btn 
     btn.target.innerText = currentBtnText;
 });
 
-// логика рассчета
-const unepRetail = 560; // B20
-const ukepRetail = 1800; // B21
-const parametrs = { // A23 и ниже
-    5: 131100,
-    10: 176316,
-    20: 296196,
-    50: 568836,
-    100: 863460,
-    200: 1726920,
-    300: 2590380
-};
-
 const calculation = (data0_1, data1_1, data2_1, discountCoefficient) => {
     if (data0_1 === '') {
         document.getElementById('kedo-field').value = 300;
@@ -119,7 +106,7 @@ const calculation = (data0_1, data1_1, data2_1, discountCoefficient) => {
 }
 
 const discountData = document.querySelectorAll('.discount-field');
-const discountPercent = discountData[0].value;
+const discountPercent = +discountData[0].value;
 const discountTime = discountData[1].value;
 
 const date = new Date();
@@ -138,6 +125,19 @@ let discountExist = false;
 if (discountPercent > 0) {
     discountExist = currentDate <= discountDate;
 }
+
+// логика рассчета
+const unepRetail = 560; // B20
+const ukepRetail = 1800; // B21
+const parametrs = { // A23 и ниже
+    5: 131100,
+    10: 176316,
+    20: 296196,
+    50: 568836,
+    100: 863460,
+    200: 1726920,
+    300: 2590380
+};
 
 const calculateForm = document.getElementById('new-calculator-form');
 const calculateBtn = document.getElementById('calculate-btn');
