@@ -118,13 +118,31 @@ const calculation = (data0_1, data1_1, data2_1, discountCoefficient) => {
     return [summaFastStartFormatted, summaExtendedFormatted, summaFastStartDiscountFormatted, summaExtendedDiscountFormatted];
 }
 
-const calculateForm = document.getElementById('new-calculator-form');
 const discountData = document.querySelectorAll('.discount-field');
+const discountPercent = discountData[0].value;
+const discountTime = discountData[1].value;
 
-document.getElementById('calculate-btn').addEventListener('click', e => {
+const date = new Date();
+const year = date.getFullYear();
+const month = (date.getMonth() + 1).toString().padStart(2, '0');
+const day = date.getDate().toString().padStart(2, '0');
+const today = `${year}-${month}-${day}`;
+
+const discountDateParts = discountTime.split('.');
+const discountDateUS = `${discountDateParts[2]}-${discountDateParts[1]}-${discountDateParts[0]}`;
+const currentDate = new Date(today);
+const discountDate = new Date(discountDateUS);
+
+let discountExist = false;
+
+if (discountPercent > 0) {
+    discountExist = currentDate <= discountDate;
+}
+
+const calculateForm = document.getElementById('new-calculator-form');
+const calculateBtn = document.getElementById('calculate-btn');
+calculateBtn.addEventListener('click', e => {
     e.preventDefault();
-    const discountPercent = +discountData[0].value;
-    const discountTime = discountData[1].value;
 
     const calculateData = [...new FormData(calculateForm)]; // аналогично как Array.from(new FormData(calculateForm))
 
@@ -135,8 +153,6 @@ document.getElementById('calculate-btn').addEventListener('click', e => {
         discount.forEach(item => item.remove());
         ratesPrices.forEach(item => item.classList.remove('discount-old-price'));
     }
-
-    const discountExist = discountPercent > 0;
 
     const result = calculation(calculateData[2][1], calculateData[3][1], calculateData[4][1], !discountExist ? 1 : discountPercent / 100);
     const summaFastStartFormatted = result[0];
@@ -163,4 +179,12 @@ document.getElementById('calculate-btn').addEventListener('click', e => {
 
     ratesPrices.forEach(item => item.innerHTML = `${summaFastStartFormatted} руб`);
     document.querySelectorAll('.extended').forEach(item => item.innerHTML = `${summaExtendedFormatted} руб`);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    calculateBtn.click();
+    setTimeout(() => {
+        const inputs = document.querySelectorAll('.field-area:not(:last-child) .form-field');
+        inputs.forEach(item => item.value = '');
+    }, 100);
 });
